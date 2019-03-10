@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "457176879859",
+    "firebase_url": "https://remindme-fc07f.firebaseio.com",
+    "project_id": "remindme-fc07f",
+    "storage_bucket": "remindme-fc07f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:457176879859:android:7355dd1dd6ab70d0",
+        "android_client_info": {
+          "package_name": "com.firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "457176879859-vtn39r9o6t120hr8i14p2g01nbnq33eg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsZVwoF6Jipkac0HDrbtmiU5TOYi_H9UU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
