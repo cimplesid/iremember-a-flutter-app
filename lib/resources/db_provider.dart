@@ -60,7 +60,7 @@ class DbProvider{
     );
 
     if (maps.length > 0){
-      return ItemModel.fromMap(maps.first);
+      // return ItemModel.fromMap(maps.first);
     }
 
     return null;

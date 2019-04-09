@@ -1,9 +1,13 @@
 import 'dart:async';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../resources/firebase_auth_provider.dart';
+import '../../resources/firestore_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/item_model.dart';
 import 'package:flutter/material.dart';
 import '../pages/itemdetail.dart';
 import 'dart:io';
+import 'additem.dart';
 import '../../resources/db_provider.dart';
 
 // 8=]45737import  'package:cloud_firestore/cloud_firestore.dart';
@@ -14,55 +18,27 @@ class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
+var _refreshkey = GlobalKey<RefreshIndicatorState>();
 
 class _HomePageState extends State<HomePage> {
   List items = [];
   void initState() {
     super.initState();
-    // getItem();
+ refreshList();
+  //  CircularProgressIndicator(value: 5,);
   }
+Future refreshList() async{
+_refreshkey.currentState?.show();
+await Future.delayed(Duration(seconds: 2));
+// setState(() {
+//  FirestoreProvider().getItems(); 
+// });
+// return null;
+}
 
-  Future<List> getItem() async {
-    return DbProvider().fetchItems();
-
-    // final sp = await SharedPreferences.getInstance();
-    // var itemString = sp.getString('item');
-    // if (itemString == null) {
-
-    // } else {
-    //   setState(() {
-    //     items = json.decode(itemString);
-    //   });
-    // }
+  removeItem(id) {
+    FirestoreProvider().delete(id);
   }
-
-  // saveItem(items) async {
-  //   final sp = await SharedPreferences.getInstance();
-  //   await sp.setString('item', json.encode(items));
-  //   print('saved to shared preferences');
-  //   print(items);
-  // }
-
-  removeItem(ItemModel item) {
-    // final sp = await SharedPreferences.getInstance();
-    // SharedPreferences preferences = getSharedPreferences("Mypref", 0);
-    // preferences.edit().remove("text").commit();
-    // await sp.setString('item', json.encode(items));
-    setState(() {
-      DbProvider().deleteItem(item.id);
-      // items.remove(item);
-    });
-    //saveItem(items);
-    //print('deleted from shared preferences');
-    //  print(items);
-  }
-
-  // add(item) async {
-  //   setState(() {
-  //     items.add(item);
-  //   });
-  //   await saveItem(items);
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +48,12 @@ class _HomePageState extends State<HomePage> {
         // leading: Icon(Icons.label),
         title: Text('IRemember'),
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.exit_to_app),
+          onPressed: () {
+            FirebaseAuthProvider().logout();
+          },
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.polymer),
@@ -84,68 +66,61 @@ class _HomePageState extends State<HomePage> {
         //Icon(Icons.label),
         // backgroundColor: Colors.limeAccent,
       ),
-      body: FutureBuilder(
-          future: getItem(),
-          builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
-            if (!snapshot.hasData)
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            if (snapshot.hasError)
-              return Center(
-                child: Text("there is an error"),
-              );
-            List items = snapshot.data;
-            return ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (BuildContext context, int index) {
-                // var litem = items[index];
-                ItemModel litem = ItemModel.fromMap(items[index]);
-
-                return ListTile(
-                  onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) =>
-                              ItemDetails(items: litem, delete: _delete))),
-                  leading: CircleAvatar(
-                    backgroundImage: FileImage(File(litem.image)),
-                  ),
-                  title: Text(litem.title),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () => _delete(litem),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text('${litem.description}'),
-                      //  new FlatButton(onPressed: () {
-                      //    remove(items);
-                      //    saveItem(items);
-                      //  },
-                      //           child: new Text("DELETE",
-                      //             style: new TextStyle(color: Colors.redAccent),)),
-
-                      SizedBox(
-                        height: 5,
-                      ),
-                      // Text(items["phone"])
-
-                      //list.items
-                    ],
-                  ),
-                  // new Row(mainAxisAlignment: MainAxisAlignment.end,
-                  //         children: <Widget>[ //add some actions, icons...etc
-                  //           new FlatButton(onPressed: () {}, child: new Text("EDIT")),
-                  //           new FlatButton(onPressed: () {},
-                  //               child: new Text("DELETE",
-                  //                 style: new TextStyle(color: Colors.redAccent),))
-                  //         ],),
+      body: RefreshIndicator(
+        onRefresh: refreshList,
+              child: StreamBuilder(
+            stream: FirestoreProvider().getItems(),
+            builder:
+                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+              if (!snapshot.hasData)
+                return Center(
+                  child: CircularProgressIndicator(),
                 );
-              },
-            );
-          }),
+              if (snapshot.hasError)
+                return Center(
+                  child: Text("there is an error"),
+                );
+              QuerySnapshot items = snapshot.data;
+              List<DocumentSnapshot> documents = items.documents;
+              return ListView.builder(
+                itemCount: documents?.length,
+                itemBuilder: (BuildContext context, int index) {
+                  // var litem = items[index];
+                  ItemModel litem = ItemModel.fromMap(documents[index]);
+
+                  return ListTile(
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) =>
+                                ItemDetails(items: litem, delete: _delete))),
+                    // leading: CircleAvatar(
+                    //   backgroundImage: FileImage(File(litem.image)),
+                    // ),
+                    title: Text(litem.title),
+                    onLongPress: (){
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context)=> Additem(item: litem,)
+                      ));
+                    },
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () => _delete(litem.id),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text('${litem.description}'),
+                        SizedBox(
+                          height: 5,
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            }),
+      ),
 
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
@@ -155,18 +130,11 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    // List <Map> items;
-    // );
+    
   }
 
-  //(item.add(_)=>items.resource(_))
-  void _delete(ItemModel item) {
-    // setState(() {
-    //  items.remove(
-    //    item
-    //  ) ;
-
-    // });
+  
+  void _delete(String id) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -181,8 +149,8 @@ class _HomePageState extends State<HomePage> {
               FlatButton(
                   child: Text("Delete"),
                   onPressed: () {
-                    removeItem(item);
-                    // Navigator.pop(context);
+                    removeItem(id);
+                   FirestoreProvider().getItems();
                     Navigator.pushReplacement(
                         context, MaterialPageRoute(builder: (_) => HomePage()));
                   }),
@@ -191,14 +159,14 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
-  AddItem(String title, String description, File _image) {
-    setState(() {
-      items.add({
-        "title": title,
-        "description": description,
-        "img": _image.path,
-      });
-    });
-    // saveItem(items);
-  }
+  // AddItem(String title, String description, File _image) {
+  //   setState(() {
+  //     items.add({
+  //       "title": title,
+  //       "description": description,
+  //       "img": _image.path,
+  //     });
+  //   });
+  //   // saveItem(items);
+  // }
 }

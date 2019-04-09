@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:RemindMe/resources/firestore_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -8,17 +9,23 @@ import '../../models/item_model.dart';
 // import 'package:shared_preferences/shared_preferences.dart';
 
 class Additem extends StatefulWidget {
+  final ItemModel item;
+  const Additem({this.item}) ;
   // final Function add;
   // Additem(this.add);
   @override
   _AdditemState createState() => _AdditemState();
 }
 
+GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
 class _AdditemState extends State<Additem> {
   File _image;
   // File galleryimage;
   String title;
   String description;
+  TextEditingController _titleController = TextEditingController();
+  TextEditingController _desController = TextEditingController();
+
 
   Future getImage(ImageSource source) async {
     var image = await ImagePicker.pickImage(source: source);
@@ -38,10 +45,27 @@ class _AdditemState extends State<Additem> {
       });
     }
   }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if(widget.item!=null){
+      _titleController.text=widget.item.title;
+      _desController.text=widget.item.description;
+
+    }
+
+  }
 
   @override
   Widget build(BuildContext context) {
+    var icon2 = Icon(
+      Icons.save,
+      size: 200.0,
+      color: Colors.white54,
+    );
     return Scaffold(
+      key: _scaffoldkey,
       appBar: AppBar(
         // color:Colors.lightBlue,
         backgroundColor: Colors.indigoAccent,
@@ -59,21 +83,12 @@ class _AdditemState extends State<Additem> {
             SizedBox(
               height: 50.0,
             ),
-            new Container(
-                child: Icon(
-              Icons.bluetooth,
-              size: 200.0,
-              color: Colors.white54,
-            )),
+            new Container(child: icon2),
             SizedBox(
               height: 50.0,
             ),
             TextField(
-              onChanged: (value) {
-                setState(() {
-                  title = value;
-                });
-              },
+              controller: _titleController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: 'title',
@@ -84,11 +99,7 @@ class _AdditemState extends State<Additem> {
               height: 20.0,
             ),
             TextField(
-              onChanged: (value) {
-                setState(() {
-                  description = value;
-                });
-              },
+              controller: _desController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(
@@ -149,18 +160,21 @@ class _AdditemState extends State<Additem> {
 
                 color: Colors.greenAccent,
 
-                onPressed: () {
-                  if (title == null || description == null || _image == null)
-                    return;
+                onPressed: () async {
+                  if (_titleController== null || _desController == null) return _scaffoldkey.currentState
+          .showSnackBar(new SnackBar(content: Text('Please fill the details to add')));
+     
 
-                  // widget.add(
-                  //   title,
-                  //   description,
-                  //   _image,
-                  // );
-                  ItemModel item =ItemModel(title: title,
-                  description: description,image: _image.path);
-                  DbProvider().addItem(item);
+                  Map<String, dynamic> item = {
+                    "title": _titleController.text,
+                    "decription": _desController.text
+                  };
+                  if(widget.item!=null){
+                    await FirestoreProvider().updateItem(widget.item.id,item);
+                  }else{
+                  await FirestoreProvider().addItem(item);
+                  }
+
                   Navigator.pop(context);
                 },
               ),

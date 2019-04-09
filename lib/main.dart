@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'ui/pages/home.dart';
 import 'dart:async';
+import 'ui/pages/login.dart';
+import 'ui/pages/signup.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 // import 'ui/pages/itemdetail.dart';
 // import 'ui/pages/additem.dart';
 
@@ -12,17 +15,30 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'subscribe to pewdiepie',
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.onAuthStateChanged,
+        builder: (BuildContext context,AsyncSnapshot<FirebaseUser> snapshot){
+          if(!snapshot.hasData)return LoginPage();
+          if(snapshot.hasData){
+            if(snapshot.data!=null){
+              if(snapshot.hasData)
+              return  HomePage();
+              else return CircularProgressIndicator();
+            }else{
+              return Scaffold(body:LoginPage());
+            }
+          }
+        },
+      ),
+     // SplashScreen(),
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
       routes: {
         "builder": (_) => HomePage(),
-        // "builder1": (_)=>,
+        "signup": (_) => SignupPage(),
       },
-      //   routes: <String, WidgetBuilder>{
-      //   '/HomeScreen': (BuildContext context) => new HomeScreen()
-      // },
+      
     );
   }
 }
@@ -40,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void navigationPage() {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (_) => HomePage()));
+        context, MaterialPageRoute(builder: (_) => LoginPage()));
     //  Navigator.of(context).pushReplacementNamed('_');
   }
 
