@@ -15,7 +15,7 @@ class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
-
+String img = "d";
 var _refreshkey = GlobalKey<RefreshIndicatorState>();
 
 class _HomePageState extends State<HomePage> {
@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage> {
                                 ItemDetails(items: litem, delete: _delete))),
                     leading: CircleAvatar(
                       backgroundImage: NetworkImage(
-                          litem.image ),
+                          litem.image!=null ? litem.image : img ),
                     ),
                     title: Text(litem.title),
                     onLongPress: () {

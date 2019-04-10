@@ -17,8 +17,10 @@ class Additem extends StatefulWidget {
 
 String url;
 
+ 
 Future<void> uploadPic(File image) async {
   var timekey = DateTime.now();
+ 
 
   StorageReference reference = FirebaseStorage.instance.ref().child("Images");
 
@@ -41,10 +43,9 @@ class _AdditemState extends State<Additem> {
     return Text(text);
   }
 
-  String description;
+ String description;
   TextEditingController _titleController = TextEditingController();
   TextEditingController _desController = TextEditingController();
-
   Future getImage(ImageSource source) async {
     var image = await ImagePicker.pickImage(source: source);
     if (image != null) {

@@ -5,6 +5,7 @@ class ItemDetails extends StatelessWidget {
   final ItemModel items;
   final Function delete;
   const ItemDetails({Key key, this.items, this.delete}) : super(key: key);
+ final String img = "d";
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,7 @@ class ItemDetails extends StatelessWidget {
                   image: DecorationImage(
                     // image: AssetImage('${items['image']}'),
                     image: NetworkImage(
-                      (items.image),
+                      (items.image!=null ? items.image : img)
                     ),
                     //var img=items['img'];
                   ),

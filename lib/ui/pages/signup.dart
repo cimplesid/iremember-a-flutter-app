@@ -113,9 +113,7 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   void _signup() async {
-// print(_emailc.text);
-// print(_passwordc.text);
-// print(_confirmpassc.text);
+
 
     try {
       FirebaseUser user =

@@ -18,15 +18,6 @@ class FirebaseAuthProvider
   Future<void> logout(){
     return _auth.signOut();
 
-
-
-
-
-
-
-
-
-
     
   }
   
