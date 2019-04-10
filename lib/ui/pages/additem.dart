@@ -66,7 +66,6 @@ class _AdditemState extends State<Additem> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     if (widget.item != null) {
       setState(() {
@@ -183,18 +182,21 @@ class _AdditemState extends State<Additem> {
                         content: Text('Please fill the details to add')));
 
                   uploadPic(_image);
-
-                  Map<String, dynamic> item = {
-                    "title": _titleController.text,
-                    "decription": _desController.text,
-                    "image": url
-                  };
-                  if (widget.item != null) {
-                    await FirestoreProvider().updateItem(widget.item.id, item);
-                  } else {
-                    await FirestoreProvider().addItem(item);
+                  try {
+                    Map<String, dynamic> item = {
+                      "title": _titleController.text,
+                      "decription": _desController.text,
+                      "image": url
+                    };
+                    if (widget.item != null) {
+                      await FirestoreProvider()
+                          .updateItem(widget.item.id, item);
+                    } else {
+                      await FirestoreProvider().addItem(item);
+                    }
+                  } catch (e) {
+                    print(e.message);
                   }
-
                   Navigator.pop(context);
                 },
               ),

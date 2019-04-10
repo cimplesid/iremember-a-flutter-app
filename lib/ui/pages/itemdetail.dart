@@ -15,7 +15,7 @@ class ItemDetails extends StatelessWidget {
           IconButton(
               icon: Icon(Icons.delete),
               onPressed: () {
-                delete(items);
+                delete(items.id);
                 
               })
         ],

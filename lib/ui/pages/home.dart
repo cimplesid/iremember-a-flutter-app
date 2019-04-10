@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage> {
                                 ItemDetails(items: litem, delete: _delete))),
                     leading: CircleAvatar(
                       backgroundImage: NetworkImage(
-                          litem.image != null ? litem.image : Text('I')),
+                          litem.image ),
                     ),
                     title: Text(litem.title),
                     onLongPress: () {
