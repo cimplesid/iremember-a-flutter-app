@@ -16,8 +16,7 @@ class ItemDetails extends StatelessWidget {
               icon: Icon(Icons.delete),
               onPressed: () {
                 delete(items);
-                // Navigator.pushReplacement(
-                //     context, MaterialPageRoute(builder: (_) => HomePage()));
+                
               })
         ],
       ),
@@ -37,7 +36,7 @@ class ItemDetails extends StatelessWidget {
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     // image: AssetImage('${items['image']}'),
-                    image: AssetImage(
+                    image: NetworkImage(
                       (items.image),
                     ),
                     //var img=items['img'];

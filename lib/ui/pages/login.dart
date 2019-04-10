@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../../resources/firebase_auth_provider.dart';
 
 class LoginPage extends StatefulWidget {
@@ -111,7 +110,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void _login() async {
     try {
-      FirebaseUser user =
+      
           await FirebaseAuthProvider().login(_emailc.text, _passwordc.text);
     } catch (e) {
       _scaffoldkey.currentState

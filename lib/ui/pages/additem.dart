@@ -1,31 +1,49 @@
 import 'dart:async';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:RemindMe/resources/firestore_provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
-import '../../resources/db_provider.dart';
 import '../../models/item_model.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
 
 class Additem extends StatefulWidget {
   final ItemModel item;
-  const Additem({this.item}) ;
-  // final Function add;
-  // Additem(this.add);
+  const Additem({this.item});
+
   @override
   _AdditemState createState() => _AdditemState();
 }
 
+String url;
+
+Future<void> uploadPic(File image) async {
+  var timekey = DateTime.now();
+
+  StorageReference reference = FirebaseStorage.instance.ref().child("Images");
+
+  StorageUploadTask uploadTask =
+      reference.child(timekey.toString() + ".jpg").putFile(image);
+
+  // Waits till the file is uploaded then stores the download url
+  url = await (await uploadTask.onComplete).ref.getDownloadURL();
+  url = url.toString();
+  print(url);
+}
+
 GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
+
 class _AdditemState extends State<Additem> {
   File _image;
-  // File galleryimage;
+  String text = "Add new item";
   String title;
+  Widget appbart() {
+    return Text(text);
+  }
+
   String description;
   TextEditingController _titleController = TextEditingController();
   TextEditingController _desController = TextEditingController();
-
 
   Future getImage(ImageSource source) async {
     var image = await ImagePicker.pickImage(source: source);
@@ -45,16 +63,18 @@ class _AdditemState extends State<Additem> {
       });
     }
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    if(widget.item!=null){
-      _titleController.text=widget.item.title;
-      _desController.text=widget.item.description;
-
+    if (widget.item != null) {
+      setState(() {
+        text = "update item";
+      });
+      _titleController.text = widget.item.title;
+      _desController.text = widget.item.description;
     }
-
   }
 
   @override
@@ -67,12 +87,9 @@ class _AdditemState extends State<Additem> {
     return Scaffold(
       key: _scaffoldkey,
       appBar: AppBar(
-        // color:Colors.lightBlue,
-        backgroundColor: Colors.indigoAccent,
-        title: Text(
-          'Add new item ',
-        ),
-      ),
+          // color:Colors.lightBlue,
+          backgroundColor: Colors.indigoAccent,
+          title: appbart()),
       body: new Container(
         decoration: new BoxDecoration(
           color: Colors.indigoAccent,
@@ -161,18 +178,21 @@ class _AdditemState extends State<Additem> {
                 color: Colors.greenAccent,
 
                 onPressed: () async {
-                  if (_titleController== null || _desController == null) return _scaffoldkey.currentState
-          .showSnackBar(new SnackBar(content: Text('Please fill the details to add')));
-     
+                  if (_titleController == null || _desController == null)
+                    return _scaffoldkey.currentState.showSnackBar(new SnackBar(
+                        content: Text('Please fill the details to add')));
+
+                  uploadPic(_image);
 
                   Map<String, dynamic> item = {
                     "title": _titleController.text,
-                    "decription": _desController.text
+                    "decription": _desController.text,
+                    "image": url
                   };
-                  if(widget.item!=null){
-                    await FirestoreProvider().updateItem(widget.item.id,item);
-                  }else{
-                  await FirestoreProvider().addItem(item);
+                  if (widget.item != null) {
+                    await FirestoreProvider().updateItem(widget.item.id, item);
+                  } else {
+                    await FirestoreProvider().addItem(item);
                   }
 
                   Navigator.pop(context);

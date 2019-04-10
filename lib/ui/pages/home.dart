@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../../resources/firebase_auth_provider.dart';
 import '../../resources/firestore_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/item_model.dart';
 import 'package:flutter/material.dart';
 import '../pages/itemdetail.dart';
-import 'dart:io';
 import 'additem.dart';
-import '../../resources/db_provider.dart';
 
 // 8=]45737import  'package:cloud_firestore/cloud_firestore.dart';
 import '../pages/additem.dart';
@@ -18,23 +15,21 @@ class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
+
 var _refreshkey = GlobalKey<RefreshIndicatorState>();
 
 class _HomePageState extends State<HomePage> {
   List items = [];
   void initState() {
     super.initState();
- refreshList();
-  //  CircularProgressIndicator(value: 5,);
+    refreshList();
+    //  CircularProgressIndicator(value: 5,);
   }
-Future refreshList() async{
-_refreshkey.currentState?.show();
-await Future.delayed(Duration(seconds: 2));
-// setState(() {
-//  FirestoreProvider().getItems(); 
-// });
-// return null;
-}
+
+  Future refreshList() async {
+    _refreshkey.currentState?.show();
+    await Future.delayed(Duration(seconds: 2));
+  }
 
   removeItem(id) {
     FirestoreProvider().delete(id);
@@ -68,7 +63,7 @@ await Future.delayed(Duration(seconds: 2));
       ),
       body: RefreshIndicator(
         onRefresh: refreshList,
-              child: StreamBuilder(
+        child: StreamBuilder(
             stream: FirestoreProvider().getItems(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -85,7 +80,6 @@ await Future.delayed(Duration(seconds: 2));
               return ListView.builder(
                 itemCount: documents?.length,
                 itemBuilder: (BuildContext context, int index) {
-                  // var litem = items[index];
                   ItemModel litem = ItemModel.fromMap(documents[index]);
 
                   return ListTile(
@@ -94,14 +88,18 @@ await Future.delayed(Duration(seconds: 2));
                         MaterialPageRoute(
                             builder: (_) =>
                                 ItemDetails(items: litem, delete: _delete))),
-                    // leading: CircleAvatar(
-                    //   backgroundImage: FileImage(File(litem.image)),
-                    // ),
+                    leading: CircleAvatar(
+                      backgroundImage: NetworkImage(
+                          litem.image != null ? litem.image : Text('I')),
+                    ),
                     title: Text(litem.title),
-                    onLongPress: (){
-                      Navigator.push(context, MaterialPageRoute(
-                        builder: (context)=> Additem(item: litem,)
-                      ));
+                    onLongPress: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Additem(
+                                    item: litem,
+                                  )));
                     },
                     trailing: IconButton(
                       icon: Icon(Icons.delete),
@@ -129,11 +127,8 @@ await Future.delayed(Duration(seconds: 2));
         child: Icon(Icons.add),
       ),
     );
-
-    
   }
 
-  
   void _delete(String id) {
     showDialog(
         context: context,
@@ -150,7 +145,7 @@ await Future.delayed(Duration(seconds: 2));
                   child: Text("Delete"),
                   onPressed: () {
                     removeItem(id);
-                   FirestoreProvider().getItems();
+                    FirestoreProvider().getItems();
                     Navigator.pushReplacement(
                         context, MaterialPageRoute(builder: (_) => HomePage()));
                   }),
