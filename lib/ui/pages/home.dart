@@ -38,9 +38,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // top_bar(),
+     
       appBar: AppBar(
-        // leading: Icon(Icons.label),
+       
         title: Text('IRemember'),
         centerTitle: true,
         leading: IconButton(
@@ -52,14 +52,13 @@ class _HomePageState extends State<HomePage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.polymer),
-            //tooltip: 'Open shopping cart',
+           
             onPressed: () {
               // ...
             },
           ),
         ],
-        //Icon(Icons.label),
-        // backgroundColor: Colors.limeAccent,
+       
       ),
       body: RefreshIndicator(
         onRefresh: refreshList,
@@ -154,14 +153,5 @@ class _HomePageState extends State<HomePage> {
         });
   }
 
-  // AddItem(String title, String description, File _image) {
-  //   setState(() {
-  //     items.add({
-  //       "title": title,
-  //       "description": description,
-  //       "img": _image.path,
-  //     });
-  //   });
-  //   // saveItem(items);
-  // }
+  
 }

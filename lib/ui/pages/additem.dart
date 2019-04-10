@@ -87,7 +87,7 @@ class _AdditemState extends State<Additem> {
     return Scaffold(
       key: _scaffoldkey,
       appBar: AppBar(
-          // color:Colors.lightBlue,
+       
           backgroundColor: Colors.indigoAccent,
           title: appbart()),
       body: new Container(
@@ -150,8 +150,7 @@ class _AdditemState extends State<Additem> {
             SizedBox(
               height: 20,
             ),
-            //Icon:Icons(Icons.home),
-
+           
             SizedBox(
               height: 50,
               width: 20.0,
@@ -182,7 +181,7 @@ class _AdditemState extends State<Additem> {
                     return _scaffoldkey.currentState.showSnackBar(new SnackBar(
                         content: Text('Please fill the details to add')));
 
-                  uploadPic(_image);
+               await uploadPic(_image);
                   try {
                     Map<String, dynamic> item = {
                       "title": _titleController.text,
